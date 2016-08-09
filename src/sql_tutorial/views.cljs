@@ -1,5 +1,5 @@
 (ns sql-tutorial.views
-  (:require-macros [devcards.core :refer [defcard-rg deftest]])
+  (:require-macros [devcards.core :refer [defcard defcard-rg]])
   (:require [re-frame.core :refer [subscribe dispatch]]
             [reagent.core :as reagent]))
 
@@ -51,27 +51,24 @@
   (let [query (subscribe [:current-query])]
     (fn [] [render-current-query @query])))
 
-; TODO has to be a more streamlined way to do this
-;   it seems a very basic sort of thing to do
 ;;
 ; input command
-(defn command-input []
-  (let [statement (reagent/atom "")
-        submit-form (fn [event]
-                      (.preventDefault event)
-                      (dispatch [:execute @statement])
-                      (reset! statement "")
-                      nil)
-        update-statement (fn [event]
-                           (reset!
-                             statement
-                             (-> event .-target .-value))
-                           nil)]
+(defn search-field [on-submit]
+  (let [value (reagent/atom "")
+        submit (fn [event]
+                 (.preventDefault event)
+                 (on-submit @value)
+                 (reset! value "")
+                 nil)
+        update (fn [event]
+                 (reset! value (-> event .-target .-value)))]
+
     (fn []
-      [:form {:on-submit submit-form}
-        [:input {:type "text"
-                 :value @statement
-                 :on-change update-statement}]])))
+      [:form {:on-submit submit}
+        [:input {:type "text", :value @value, :on-change update}]])))
+
+(defcard search-field
+  (reagent/as-element [search-field #(js/alert %)]))
 
 ; schema component, update on execute
 
@@ -90,4 +87,4 @@
   [:div
     [problem-description]
     [current-query]
-    [command-input]])
+    [search-field #(dispatch [:execute %])]])
