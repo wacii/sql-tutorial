@@ -12,7 +12,7 @@
    (.run db statements)))
 
 (defn ^:private sql->map [results]
-  (zipmap (get results "columns") (get results "values")))
+  (map #(zipmap (get results "columns") %) (get results "values")))
 
 ;; TODO: move back the keyword column and values
 (defn ^:private sql-execute [statement]

@@ -24,18 +24,24 @@
 ;;
 ; sql results as table
 (defn sql-record [record]
- [:tr
-   (for [value record] [:td value])])
+  [:tr
+    (for [value record]
+      ^{:key value} [:td value])])
 
 (defn sql-results [results]
-  ; FIXME how do you want to represent data?
-  ; results is in data format returned by sql, not actually a map
   (let [keys (-> results (first) (keys))
         rows (map vals results)]
     [:table
       [:thead
-        [:tr (for [key keys] [:th key])]]
-      [:tbody (for [row rows] [sql-record row])]]))
+        [:tr
+          (for [key keys]
+            ^{:key key} [:th key])]]
+      [:tbody
+        (for [row rows]
+          ^{:key row} [sql-record row])]]))
+
+(defcard-rg sql-results
+  (sql-results [{:id 1, :name "Sam"} {:id 2, :name "Jane"}]))
 
 ; TODO what should the default results be?
 ;;
