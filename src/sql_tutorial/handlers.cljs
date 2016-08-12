@@ -38,16 +38,20 @@
 ; HANDLERS
 (defn execute-statement [state [_ statement]]
   (let [result (sql/execute statement)]
-    (assoc state
-           :query statement
-           :result result
-           :show-query-results (sql/execute (:show-query state))
-           :schema (sql/schema)
-           :completed (tests-pass? state))))
+       [lesson (:current-lesson state)]
+    (update-in state [:current-lesson] assoc
+      :query statement
+      :result result
+      :show-query-results (sql/execute (:show-query lesson))
+      :schema (sql/schema)
+      :completed (tests-pass? lesson))))
 (register-handler :execute execute-statement)
 
+; TODO select initial lesson given data from ls
 (register-handler
   :initialize-db
-  (fn [state _]
-    (sql/reset-db (:db-setup init-state))
-    init-state))
+  (fn [_ _]
+    (let [lesson (first (:lessons init-state))
+          state (assoc init-state :current-lesson lesson)]
+      (sql/reset-db (:db-setup lesson))
+      state)))

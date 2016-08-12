@@ -5,9 +5,11 @@
 (register-sub
   :current-lesson
   (fn [db _]
-    (reaction (select-keys @db [:title :description :completed]))))
+    (reaction
+      (select-keys (:current-lesson @db) [:title :description :completed]))))
 
 (register-sub
   :current-query
   (fn [db _]
-    (reaction (select-keys @db [:query :result]))))
+    (reaction
+      (select-keys (:current-lesson @db) [:query :result]))))
