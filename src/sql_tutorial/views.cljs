@@ -43,20 +43,26 @@
 (defcard-rg sql-results
   (sql-results [{:id 1, :name "Sam"} {:id 2, :name "Jane"}]))
 
-; TODO what should the default results be?
 ;;
 ; show command and results
-(defn render-current-query [{:keys [query result]}]
-  [:div
-    [:pre [:code query]]
-    (if (= (first result) :error)
-      [:p (.-message (second result))]
-      [sql-results (second result)])])
+(defn render-current-query
+  "Display query and its results, or a no results message."
+  [{:keys [query result]}]
+  (if (empty? query)
+    [:p "Enter a command"]
+    [:div
+      [:pre [:code query]]
+      (if (= (first result) :error)
+        [:p (.-message (second result))]
+        (if (empty? (second result))
+          [:p "No results!"]
+          [sql-results (second result)]))]))
 
 (defn current-query []
-  (let [query (subscribe [:current-query])]
-    (fn [] [render-current-query @query])))
+  (let [sub (subscribe [:current-query])]
+    (fn [] [render-current-query @sub])))
 
+; TODO: up/down arrow through command history
 ;;
 ; input command
 (defn search-field [on-submit]
