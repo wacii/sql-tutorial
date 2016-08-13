@@ -13,3 +13,10 @@
   (fn [db _]
     (reaction
       (select-keys (:current-lesson @db) [:query :result]))))
+
+(register-sub
+  :lessons
+  (fn [db _]
+    (reaction
+      {:current (get-in @db [:current-lesson :id])
+       :lessons (:lessons @db)})))

@@ -37,8 +37,8 @@
 
 ; HANDLERS
 (defn execute-statement [state [_ statement]]
-  (let [result (sql/execute statement)]
-       [lesson (:current-lesson state)]
+  (let [result (sql/execute statement)
+        lesson (:current-lesson state)]
     (update-in state [:current-lesson] assoc
       :query statement
       :result result
@@ -46,6 +46,10 @@
       :schema (sql/schema)
       :completed (tests-pass? lesson))))
 (register-handler :execute execute-statement)
+
+(defn change-lesson [state [_ id]]
+  (assoc state :current-lesson (get (:lessons state) id)))
+(register-handler :change-lesson change-lesson)
 
 ; TODO select initial lesson given data from ls
 (register-handler

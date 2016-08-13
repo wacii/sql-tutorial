@@ -82,6 +82,37 @@
 (defcard search-field
   (reagent/as-element [search-field #(js/alert %)]))
 
+; TODO don't store lesson index here, or any state at all
+;   instead store in app state and just rerender this
+;   related to the updates to :current-lesson in db
+;;
+; select lesson
+(defn render-lesson-select [on-change {:keys [current lessons]}]
+  (let [value (reagent/atom current)
+        update (fn [event]
+                 (let [selected (-> event .-target .-value int)]
+                   (reset! value selected)
+                   (on-change selected)
+                   nil))]
+    (fn []
+      [:select {:value @value, :on-change update}
+        (for [lesson lessons
+              :let [id (:id lesson)]]
+          ^{:key id} [:option {:value id} (:title lesson)])])))
+
+(defn lesson-select [change-lesson]
+  (let [sub (subscribe [:lessons])]
+    (fn [] [render-lesson-select change-lesson @sub])))
+
+(defcard lesson-select
+  (reagent/as-element [render-lesson-select
+                        #(js/alert %)
+                        {:current 2
+                         :lessons [{:id 1 :title "SELECT"}
+                                   {:id 2 :title "UPDATE"}
+                                   {:id 3 :title "INSERT INTO"}]}]))
+
+
 ; schema component, update on execute
 
 ; query component, update on execute
@@ -97,6 +128,7 @@
 ; app container
 (defn problem-layout []
   [:div
+    [lesson-select #(dispatch [:change-lesson %])]
     [problem-description]
     [current-query]
     [search-field #(dispatch [:execute %])]])
