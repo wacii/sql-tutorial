@@ -21,3 +21,9 @@
   (fn [db _]
     (reaction
       (select-vals @db [:current-lesson-id :lessons-info]))))
+
+(register-sub
+  :completed
+  (fn [db _]
+    (reaction
+      (select-keys @db [:completed :correct]))))

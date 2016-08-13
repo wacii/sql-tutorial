@@ -16,7 +16,7 @@
 
 ;; TODO: move back the keyword column and values
 (defn ^:private sql-execute [statement]
-  (->> (.exec db statement) (js->clj) (first)))
+  (-> (.exec db statement) (js->clj) (first)))
 
 (defn execute [statement]
   (try

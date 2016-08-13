@@ -9,33 +9,33 @@
   "Set actual value of a test as the results of some query, either
     1) :current, meaning the the results of the current query
     2) or a string, represent a query to be run"
-  [state test]
+  [result test]
   (if (= (:actual test) :current)
-    (assoc test :actual (:current state))
-    (update test :actual sql/execute)))
+    (assoc test :actual result)
+    (update test :actual (comp second sql/execute))))
+; TODO ^ more of this success/error results nonsense
 
 (defn filter-actual
   "Tests may provide keys to filter the actual results.
   Sometimes you don't care if the results match exactly."
   [test]
   (if (contains? test :keys)
-    (update test :actual #(select-keys % (:keys test)))
+    (select-keys (:actual test) (:keys test))
     test))
 
 (defn test-passes? [test]
   (= (:actual test) (:expected test)))
 
-(defn passing? [state test]
-  (->> (get-actual state test)
+(defn passing? [result test]
+  (->> (get-actual result test)
        (filter-actual)
        (test-passes?)))
 
-(defn tests-pass? [state]
-  (every? (partial passing? state) (:tests state)))
+(defn tests-pass? [result tests]
+  (every? (partial passing? result) tests))
 
 ; MIDDLEWARE
 (defn ls-save [state]
-  (.log js/console state)
   (.setItem js/localStorage "state" (pr-str state)))
 
 (defn ls-load []
@@ -47,12 +47,13 @@
       (ls-save new-state)
       new-state)))
 
+; TODO how to handle success vs error result here
 ; TODO finish implementing show-query-results and schema
 ; HANDLERS
 (defn execute-statement [state [_ statement]]
   (let [result (sql/execute statement)
         lesson (:current-lesson state)
-        correct (tests-pass? lesson)]
+        correct (tests-pass? (second result) (get-in state [:current-lesson :tests]))]
     (assoc state
       :query statement
       :result result
@@ -68,11 +69,16 @@
     :current-lesson-id id))
 (register-handler :change-lesson ls (fn [_ [_ id]] (change-lesson id)))
 
+; TODO enable load from ls when code is improved
+; TODO move to saving just the current lesson id in ls
+;   this reduces the amount that can go wrong, and this is just a side project
+; TODO reload current lesson if loaded lesson is out of date
+;   likely want to always reload lessons info as well
 (register-handler
   :initialize-db
   (fn [_ _]
     (let [prev (ls-load)
-          state (if (empty? prev)
+          state (if true;(empty? prev)
                   (change-lesson 0)
                   prev)]
       (sql/reset-db (:db-setup (:current-lesson state)))

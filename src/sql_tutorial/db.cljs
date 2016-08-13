@@ -1,37 +1,30 @@
 (ns sql-tutorial.db)
 
 (def lessons
-  [{:id 0
-    :title "Basic Queries"
+  [{:title "SELECT"
     :description "A description!"
     :db-setup "DROP TABLE IF EXISTS users;
                CREATE TABLE users (name, email);
                INSERT INTO users (name, email)
                VALUES ('Sam', 'sam1234@example.com'),
                       ('Joe', 'jjguy@example.com');"
-    :tests [{:expected [{:name "Sam"}]
-             :keys [:name]
-             :actual :current}
-            {:expected [{:name "John"}]
-             :actual "SELECT name FROM users;"}]
+    :tests [{:expected [{"name" "Sam"}]
+             :keys ["name"]
+             :actual :current}]
     :show-schema-for :all
     :show-query "SELECT * FROM users;"
     :completed false
     :query ""
     :result {}}
-   {:id 1
-    :title "Basic Queries II"
+   {:title "INSERT"
     :description "More stuff!"
     :db-setup "DROP TABLE IF EXISTS users;
                CREATE TABLE users (name, email);
                INSERT INTO users (name, email)
                VALUES ('Sam', 'sam1234@example.com'),
                       ('Joe', 'jjguy@example.com');"
-    :tests [{:expected [{:name "Sam"}]
-             :keys [:name]
-             :actual :current}
-            {:expected [{:name "John"}]
-             :actual "SELECT name FROM users;"}]
+    :tests [{:expected [{"name" "John"}]
+             :actual "SELECT DISTINCT name FROM users where name = \"John\";"}]
     :show-schema-for :all
     :show-query "SELECT * FROM users;"
     :completed false

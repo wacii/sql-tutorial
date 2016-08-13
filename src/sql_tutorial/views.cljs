@@ -101,6 +101,15 @@
                             {:id 2 :title "UPDATE"}
                             {:id 3 :title "INSERT INTO"}]]]))
 
+; TODO next problem button, linked to completed and corrected
+(defn render-lesson-finished [{:keys [completed correct]}]
+  [:div
+    [:p (if completed "Completed!" "Not Completed!")]
+    [:p (if correct "Yes" "Not yet")]])
+
+(defn lesson-finished []
+  (let [sub (subscribe [:completed])]
+    (render-lesson-finished @sub)))
 
 ; schema component, update on execute
 
@@ -108,17 +117,12 @@
 
 ; TODO visual programming bits
 
-; TODO client-side routing for bookmarking and wutnot
-;   or maybe just remember progress in ls
-
-; TODO show completed vs corrected state
-;   next problem button, linked to completed and corrected
-
 ;;
 ; app container
 (defn problem-layout []
   [:div
     [lesson-select #(dispatch [:change-lesson %])]
     [problem-description]
+    [lesson-finished]
     [current-query]
     [search-field #(dispatch [:execute %])]])
