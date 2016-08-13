@@ -5,8 +5,6 @@
   (:require-macros [devcards.core :refer [defcard tests]]
                    [cljs.test :refer [is testing]]))
 
-;; TODO: navigate between lessons
-
 (defn get-actual
   "Set actual value of a test as the results of some query, either
     1) :current, meaning the the results of the current query
@@ -50,25 +48,17 @@
       :correct correct)))
 (register-handler :execute execute-statement)
 
-
-; TODO extract default state and merge it with new current-lesson
-(defn change-lesson [state id]
-  (assoc state
+(defn change-lesson [id]
+  (assoc init-state
     :current-lesson (get-lesson id)
-    :current-lesson-id id
-    :query ""
-    :results {}
-    :show-query-results {}
-    :schema {}
-    :completed false
-    :correct false))
-(register-handler :change-lesson (fn [state [_ id]] (change-lesson state id)))
+    :current-lesson-id id))
+(register-handler :change-lesson (fn [_ [_ id]] (change-lesson id)))
 
 ; TODO select initial lesson given data from ls
 (register-handler
   :initialize-db
   (fn [_ _]
     (let [lesson (get-lesson 0)
-          state (change-lesson init-state 0)]
+          state (change-lesson 0)]
       (sql/reset-db (:db-setup lesson))
       state)))
