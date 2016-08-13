@@ -33,6 +33,20 @@
 (defn tests-pass? [state]
   (every? (partial passing? state) (:tests state)))
 
+; MIDDLEWARE
+(defn ls-save [state]
+  (.log js/console state)
+  (.setItem js/localStorage "state" (pr-str state)))
+
+(defn ls-load []
+  (->> "state" (.getItem js/localStorage) (str) (cljs.reader/read-string)))
+
+(defn ls [handler]
+  (fn [state v]
+    (let [new-state (handler state v)]
+      (ls-save new-state)
+      new-state)))
+
 ; TODO finish implementing show-query-results and schema
 ; HANDLERS
 (defn execute-statement [state [_ statement]]
@@ -46,19 +60,20 @@
       :schema (sql/schema)
       :completed (or (:completed state) correct)
       :correct correct)))
-(register-handler :execute execute-statement)
+(register-handler :execute ls execute-statement)
 
 (defn change-lesson [id]
   (assoc init-state
     :current-lesson (get-lesson id)
     :current-lesson-id id))
-(register-handler :change-lesson (fn [_ [_ id]] (change-lesson id)))
+(register-handler :change-lesson ls (fn [_ [_ id]] (change-lesson id)))
 
-; TODO select initial lesson given data from ls
 (register-handler
   :initialize-db
   (fn [_ _]
-    (let [lesson (get-lesson 0)
-          state (change-lesson 0)]
-      (sql/reset-db (:db-setup lesson))
+    (let [prev (ls-load)
+          state (if (empty? prev)
+                  (change-lesson 0)
+                  prev)]
+      (sql/reset-db (:db-setup (:current-lesson state)))
       state)))
