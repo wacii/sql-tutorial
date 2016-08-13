@@ -3,15 +3,12 @@
   (:require [re-frame.core :refer [subscribe dispatch]]
             [reagent.core :as reagent]))
 
-; TODO: should you be able to move from correct to incorrect?
 ;;
 ; show problem description component
-; and communicate problem state
-(defn render-problem-description [{:keys [title description completed]}]
+(defn render-problem-description [{:keys [title description]}]
   [:div
    [:p title]
-   [:p description]
-   (if completed [:p "Success!"])])
+   [:p description]])
 
 (defn problem-description []
   (let [lesson-summary (subscribe [:current-lesson])]
@@ -82,23 +79,16 @@
 (defcard search-field
   (reagent/as-element [search-field #(js/alert %)]))
 
-; TODO don't store lesson index here, or any state at all
-;   instead store in app state and just rerender this
-;   related to the updates to :current-lesson in db
 ;;
 ; select lesson
-(defn render-lesson-select [on-change {:keys [current lessons]}]
-  (let [value (reagent/atom current)
-        update (fn [event]
-                 (let [selected (-> event .-target .-value int)]
-                   (reset! value selected)
-                   (on-change selected)
-                   nil))]
-    (fn []
-      [:select {:value @value, :on-change update}
-        (for [lesson lessons
-              :let [id (:id lesson)]]
-          ^{:key id} [:option {:value id} (:title lesson)])])))
+(defn render-lesson-select [on-change [value lessons]]
+  (let [update (fn [event]
+                 (on-change (-> event .-target .-value int))
+                 nil)]
+    [:select {:value value, :on-change update}
+      (for [lesson lessons
+            :let [id (:id lesson)]]
+        ^{:key id} [:option {:value id} (:title lesson)])]))
 
 (defn lesson-select [change-lesson]
   (let [sub (subscribe [:lessons])]
@@ -106,11 +96,10 @@
 
 (defcard lesson-select
   (reagent/as-element [render-lesson-select
-                        #(js/alert %)
-                        {:current 2
-                         :lessons [{:id 1 :title "SELECT"}
-                                   {:id 2 :title "UPDATE"}
-                                   {:id 3 :title "INSERT INTO"}]}]))
+                        (do)
+                        [2 [{:id 1 :title "SELECT"}
+                            {:id 2 :title "UPDATE"}
+                            {:id 3 :title "INSERT INTO"}]]]))
 
 
 ; schema component, update on execute
@@ -122,7 +111,8 @@
 ; TODO client-side routing for bookmarking and wutnot
 ;   or maybe just remember progress in ls
 
-; TODO move between lessons
+; TODO show completed vs corrected state
+;   next problem button, linked to completed and corrected
 
 ;;
 ; app container
