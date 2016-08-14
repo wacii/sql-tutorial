@@ -5,33 +5,22 @@
   (:require-macros [devcards.core :refer [defcard tests]]
                    [cljs.test :refer [is testing]]))
 
-; TODO no reason to update current lesson tests with actual results
-;   do not add more state unless necessary, just pass the value along
-(defn get-actual
-  "Set actual value of a test as the results of some query, either
-    1) :current, meaning the the results of the current query
-    2) or a string, represent a query to be run"
-  [result test]
+(defn get-actual [result test]
   (if (= (:actual test) :current)
-    (assoc test :actual result)
-    (update test :actual (comp second sql/execute))))
+    result
+    (-> (:actual test) (sql/execute) (second))))
 ; TODO ^ more of this success/error results nonsense
 
-(defn filter-actual
-  "Tests may provide keys to filter the actual results.
-  Sometimes you don't care if the results match exactly."
-  [test]
+(defn filter-actual [result test]
   (if (contains? test :keys)
-    (select-keys (:actual test) (:keys test))
-    test))
-
-(defn test-passes? [test]
-  (= (:actual test) (:expected test)))
+    (for [record result] (select-keys record (:keys test)))
+    result))
 
 (defn passing? [result test]
-  (->> (get-actual result test)
-       (filter-actual)
-       (test-passes?)))
+  (-> result
+    (get-actual test)
+    (filter-actual test)
+    (= (:expected test))))
 
 (defn tests-pass? [result tests]
   (every? (partial passing? result) tests))
