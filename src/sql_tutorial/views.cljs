@@ -53,7 +53,7 @@
         (if (empty? result)
           [:p "No results!"]
           [sql-results result])
-        [:p (.-message error)])]))
+        [:p error])]))
 
 (defn current-query []
   (let [sub (subscribe [:current-query])]
@@ -102,6 +102,8 @@
                             {:id 3 :title "INSERT INTO"}]]]))
 
 ; TODO next problem button, linked to completed and corrected
+;;
+; lesson completion
 (defn render-lesson-finished [{:keys [completed correct]}]
   [:div
     [:p (if completed "Completed!" "Not Completed!")]

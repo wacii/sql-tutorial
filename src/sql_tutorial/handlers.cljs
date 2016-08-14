@@ -52,7 +52,9 @@
   (assoc state
     :query statement
     :result {}
-    :error error))
+    :correct false
+    :error (.-message error)))
+
 (register-handler
   :execute
   (fn [db v]
