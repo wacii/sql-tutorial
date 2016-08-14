@@ -19,10 +19,7 @@
   (-> (.exec db statement) (js->clj) (first)))
 
 (defn execute [statement]
-  (try
-    [:success (sql->map (sql-execute statement))]
-    (catch :default e
-      [:error e])))
+  (-> statement (sql-execute) (sql->map)))
 
 (defn ^:private query-column [statement]
   (first (:values (sql-execute statement))))

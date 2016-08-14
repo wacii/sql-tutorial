@@ -12,7 +12,7 @@
   :current-query
   (fn [db _]
     (reaction
-      (select-keys @db [:query :result]))))
+      (select-keys @db [:query :result :error]))))
 
 (def ^:private select-vals (comp vals select-keys))
 

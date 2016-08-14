@@ -8,8 +8,7 @@
 (defn get-actual [result test]
   (if (= (:actual test) :current)
     result
-    (-> (:actual test) (sql/execute) (second))))
-; TODO ^ more of this success/error results nonsense
+    (-> (:actual test) (sql/execute))))
 
 (defn filter-actual [result test]
   (if (contains? test :keys)
@@ -35,21 +34,32 @@
       (.setItem js/localStorage "lesson" (:current-lesson-id new-state))
       new-state)))
 
-; TODO how to handle success vs error result here
 ; TODO finish implementing show-query-results and schema
 ; HANDLERS
 (defn execute-statement [state [_ statement]]
   (let [result (sql/execute statement)
         lesson (:current-lesson state)
-        correct (tests-pass? (second result) (get-in state [:current-lesson :tests]))]
+        correct (tests-pass? result (:tests lesson))]
     (assoc state
       :query statement
       :result result
       :show-query-results (sql/execute (:show-query lesson))
       :schema (sql/schema)
       :completed (or (:completed state) correct)
-      :correct correct)))
-(register-handler :execute execute-statement)
+      :correct correct
+      :error "")))
+(defn process-error [state [_ statement] error]
+  (assoc state
+    :query statement
+    :result {}
+    :error error))
+(register-handler
+  :execute
+  (fn [db v]
+    (try
+      (execute-statement db v)
+      (catch :default e
+        (process-error db v e)))))
 
 (defn change-lesson [id]
   (assoc init-state

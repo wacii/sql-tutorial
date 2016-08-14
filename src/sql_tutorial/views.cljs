@@ -44,16 +44,16 @@
 ; show command and results
 (defn render-current-query
   "Display query and its results, or a no results message."
-  [{:keys [query result]}]
+  [{:keys [query result error]}]
   (if (empty? query)
     [:p "Enter a command"]
     [:div
       [:pre [:code query]]
-      (if (= (first result) :error)
-        [:p (.-message (second result))]
-        (if (empty? (second result))
+      (if (empty? error)
+        (if (empty? result)
           [:p "No results!"]
-          [sql-results (second result)]))]))
+          [sql-results result])
+        [:p (.-message error)])]))
 
 (defn current-query []
   (let [sub (subscribe [:current-query])]
