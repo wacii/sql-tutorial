@@ -5,6 +5,8 @@
   (:require-macros [devcards.core :refer [defcard tests]]
                    [cljs.test :refer [is testing]]))
 
+; TODO no reason to update current lesson tests with actual results
+;   do not add more state unless necessary, just pass the value along
 (defn get-actual
   "Set actual value of a test as the results of some query, either
     1) :current, meaning the the results of the current query
@@ -35,16 +37,13 @@
   (every? (partial passing? result) tests))
 
 ; MIDDLEWARE
-(defn ls-save [state]
-  (.setItem js/localStorage "state" (pr-str state)))
-
 (defn ls-load []
-  (->> "state" (.getItem js/localStorage) (str) (cljs.reader/read-string)))
+  (-> (.getItem js/localStorage "lesson") (int)))
 
 (defn ls [handler]
   (fn [state v]
     (let [new-state (handler state v)]
-      (ls-save new-state)
+      (.setItem js/localStorage "lesson" (:current-lesson-id new-state))
       new-state)))
 
 ; TODO how to handle success vs error result here
@@ -61,7 +60,7 @@
       :schema (sql/schema)
       :completed (or (:completed state) correct)
       :correct correct)))
-(register-handler :execute ls execute-statement)
+(register-handler :execute execute-statement)
 
 (defn change-lesson [id]
   (assoc init-state
@@ -69,17 +68,10 @@
     :current-lesson-id id))
 (register-handler :change-lesson ls (fn [_ [_ id]] (change-lesson id)))
 
-; TODO enable load from ls when code is improved
-; TODO move to saving just the current lesson id in ls
-;   this reduces the amount that can go wrong, and this is just a side project
-; TODO reload current lesson if loaded lesson is out of date
-;   likely want to always reload lessons info as well
 (register-handler
   :initialize-db
   (fn [_ _]
-    (let [prev (ls-load)
-          state (if true;(empty? prev)
-                  (change-lesson 0)
-                  prev)]
+    (let [lesson-id (ls-load)
+          state (change-lesson lesson-id)]
       (sql/reset-db (:db-setup (:current-lesson state)))
       state)))
