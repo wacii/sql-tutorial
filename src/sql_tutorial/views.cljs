@@ -42,7 +42,7 @@
 
 ;;
 ; show command and results
-(defn render-current-query
+(defn render-previous-query
   "Display query and its results, or a no results message."
   [{:keys [query result error]}]
   (if (empty? query)
@@ -55,10 +55,11 @@
           [sql-results result])
         [:p error])]))
 
-(defn current-query []
-  (let [sub (subscribe [:current-query])]
-    (fn [] [render-current-query @sub])))
+(defn previous-query []
+  (let [sub (subscribe [:previous-query])]
+    (fn [] [render-previous-query @sub])))
 
+; TODO: maintain current query on global state to mirror blocks ???
 ; TODO: up/down arrow through command history
 ;;
 ; input command
@@ -107,17 +108,59 @@
 (defn render-lesson-finished [{:keys [completed correct]}]
   [:div
     [:p (if completed "Completed!" "Not Completed!")]
-    [:p (if correct "Yes" "Not yet")]])
+    [:p (if correct "Correct!" "Incorrect!")]])
 
 (defn lesson-finished []
   (let [sub (subscribe [:completed])]
     (render-lesson-finished @sub)))
 
+;;
+; visual programming
+(def blocks
+  [["SELECT" "FROM" "WHERE" "INNER" "OUTER" "JOIN"]
+   ["*" "ON" "AND" "OR" "=" "," "<" ">" ";"]
+   ["Sam" "Joe" "sam1234@example.com" "jjguy@example.com" 1 2 3]])
+
+(defn block [word submit]
+  [:button {:on-click submit} word])
+
+(defn block-group [words]
+  [:ul.inline
+    (for [word words]
+      ^{:key word} [:li [block word #(dispatch [:push word])]])])
+
+; TODO render the table blocks differently with a different color or something
+;   maybe provide children to block-group and have those rendered first
+(defn render-schema-blocks [schema]
+  [:div
+    (for [table schema]
+      ^{:key (first table)} [block-group (flatten table)])])
+
+(defn schema-blocks []
+  (let [sub (subscribe [:schema])]
+    [render-schema-blocks @sub]))
+
+(defn render-block-container [groups]
+  [:div
+    [:ul.inline
+      ^{:key "pop"} [:li [block "delete" #(dispatch [:pop])]]
+      ^{:key "clear"} [:li [block "clear" #(dispatch [:clear])]]
+      ^{:key "run"} [:li [block "run" #(dispatch [:run])]]]
+    (for [group groups]
+      ^{:key group} [block-group group])
+    [schema-blocks]])
+(defn block-container []
+  (render-block-container blocks))
+
+(defn render-current-query [current-query]
+  [:p (clojure.string/join " " current-query)])
+(defn current-query []
+  (let [sub (subscribe [:current-query])]
+    (render-current-query @sub)))
+
 ; schema component, update on execute
 
 ; query component, update on execute
-
-; TODO visual programming bits
 
 ;;
 ; app container
@@ -126,5 +169,7 @@
     [lesson-select #(dispatch [:change-lesson %])]
     [problem-description]
     [lesson-finished]
-    [current-query]
-    [search-field #(dispatch [:execute %])]])
+    [previous-query]
+    [search-field #(dispatch [:execute %])]
+    [block-container]
+    [current-query]])

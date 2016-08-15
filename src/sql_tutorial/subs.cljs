@@ -9,7 +9,7 @@
       (select-keys (:current-lesson @db) [:title :description]))))
 
 (register-sub
-  :current-query
+  :previous-query
   (fn [db _]
     (reaction
       (select-keys @db [:query :result :error]))))
@@ -27,3 +27,13 @@
   (fn [db _]
     (reaction
       (select-keys @db [:completed :correct]))))
+
+(register-sub
+  :current-query
+  (fn [db _]
+    (reaction (:current-query @db))))
+
+(register-sub
+  :schema
+  (fn [db _]
+    (reaction (:schema @db))))

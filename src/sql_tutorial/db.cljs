@@ -43,6 +43,7 @@
 (def init-state
   {:current-lesson {}
    :current-lesson-id 0
+   :current-query []
    :query ""
    :result {}
    :completed false

@@ -21,13 +21,14 @@
 (defn execute [statement]
   (-> statement (sql-execute) (sql->map)))
 
-(defn ^:private query-column [statement]
-  (first (:values (sql-execute statement))))
+(defn ^:private query-column [statement column]
+  (map #(get % column) (execute statement)))
 
 (defn ^:private add-column-names [table-info table-name]
-  (let [statement (str "SELECT name FROM (PRAGMA table_info(" table-name "));")
-        column-names (query-column statement)]
+  (let [statement (str "PRAGMA table_info(" table-name ");")
+        column-names (query-column statement "name")]
     (assoc table-info table-name column-names)))
 
 (defn schema []
-  (reduce add-column-names {} (query-column "SELECT name FROM sqlite_master;")))
+  (let [tables (query-column "SELECT name FROM sqlite_master;" "name")]
+    (reduce add-column-names {} tables)))
