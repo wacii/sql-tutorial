@@ -64,11 +64,14 @@
       (catch :default error
         (process-error db statement error)))))
 
-; TODO setup schema, run lesson startup code
 (defn change-lesson [id]
-  (assoc init-state
-    :current-lesson (get-lesson id)
-    :current-lesson-id id))
+  (let [lesson (get-lesson id)]
+    (sql/reset-db (:db-setup lesson))
+    (assoc init-state
+      :current-lesson lesson
+      :current-lesson-id id
+      :show-query-results (sql/execute (:show-query lesson))
+      :schema (sql/schema))))
 (register-handler :change-lesson ls (fn [_ [_ id]] (change-lesson id)))
 
 (defn push-code-block [state [_ block]]
