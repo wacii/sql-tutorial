@@ -36,7 +36,7 @@
 
 ; TODO finish implementing show-query-results and schema
 ; HANDLERS
-(defn execute-statement [state [_ statement]]
+(defn execute-statement [state statement]
   (let [result (sql/execute statement)
         lesson (:current-lesson state)
         correct (tests-pass? result (:tests lesson))]
@@ -49,7 +49,7 @@
       :completed (or (:completed state) correct)
       :correct correct
       :error "")))
-(defn process-error [state [_ statement] error]
+(defn process-error [state statement error]
   (assoc state
     :query statement
     :result {}
@@ -58,11 +58,11 @@
 
 (register-handler
   :execute
-  (fn [db v]
+  (fn [db [_ statement]]
     (try
-      (execute-statement db v)
-      (catch :default e
-        (process-error db v e)))))
+      (execute-statement db statement)
+      (catch :default error
+        (process-error db statement error)))))
 
 ; TODO setup schema, run lesson startup code
 (defn change-lesson [id]
@@ -83,10 +83,8 @@
   (assoc state :current-query []))
 (register-handler :clear clear-code-blocks)
 
-; TODO cleanup execute-statement so that it can be used more easily by both
-;   handlers calling into it
-(defn run-code-blocks [state [v]]
-  (execute-statement state [v (clojure.string/join " " (:current-query state))]))
+(defn run-code-blocks [state _]
+  (execute-statement state (clojure.string/join " " (:current-query state))))
 (register-handler :run run-code-blocks)
 
 (register-handler
