@@ -35,7 +35,7 @@
                            :output-to "resources/public/js/compiled/sql_tutorial.js"
                            :output-dir "resources/public/js/compiled/out"
                            :source-map-timestamp true
-                           :externs ["resources/public/sql.js"]}}
+                           :externs ["externs/sql.js"]}} ; TODO does this need to be here?
                ;; This next build is an compressed minified build for
                ;; production. You can build this with:
                ;; lein cljsbuild once min
@@ -45,7 +45,7 @@
                            :main sql-tutorial.core
                            :optimizations :advanced
                            :pretty-print false
-                           :externs ["resources/public/sql.js"]}}]}
+                           :externs ["externs/sql.js"]}}]}
 
   :figwheel {;; :http-server-root "public" ;; default and assumes "resources"
              ;; :server-port 3449 ;; default

@@ -10,8 +10,8 @@
 (defn sql-tutorial []
   [problem-layout])
 
-;; TODO: call this in index.html
 (defn ^:export init[]
+  ; TODO: call this conditionally based on a debug flag
   (devtools/install!)
   (re-frame/dispatch-sync [:initialize-db])
   (reagent/render-component [sql-tutorial]
