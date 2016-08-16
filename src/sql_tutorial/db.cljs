@@ -11,6 +11,8 @@
     :tests [{:expected [{"name" "Sam"}]
              :keys ["name"]
              :actual :current}]
+    :blocks-list [:select :symbols]
+    :use-schema-blocks true
     :show-schema-for :all
     :show-query "SELECT * FROM users;"
     :completed false
@@ -25,6 +27,10 @@
                       ('Joe', 'jjguy@example.com');"
     :tests [{:expected [{"name" "John"}]
              :actual "SELECT DISTINCT name FROM users where name = \"John\";"}]
+    :blocks-list [:insert
+                  :symbols
+                  ["'John'" "'Sam'" "'jjguy@example.com'"]]
+    :use-schema-blocks true
     :show-schema-for :all
     :show-query "SELECT * FROM users;"
     :completed false

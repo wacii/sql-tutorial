@@ -135,22 +135,24 @@
   [:div
     (for [table schema]
       ^{:key (first table)} [block-group (flatten table)])])
-
 (defn schema-blocks []
   (let [sub (subscribe [:schema])]
-    [render-schema-blocks @sub]))
+    (render-schema-blocks @sub)))
 
-(defn render-block-container [groups]
+; TODO rename use-schema-blocks/schema-blocks
+(defn render-block-container [{:keys [blocks use-schema-blocks]}]
+  (.log js/console use-schema-blocks)
   [:div
     [:ul.inline
       ^{:key "pop"} [:li [block "delete" #(dispatch [:pop])]]
       ^{:key "clear"} [:li [block "clear" #(dispatch [:clear])]]
       ^{:key "run"} [:li [block "run" #(dispatch [:run])]]]
-    (for [group groups]
+    (for [group blocks]
       ^{:key group} [block-group group])
-    [schema-blocks]])
+    (and use-schema-blocks [schema-blocks])])
 (defn block-container []
-  (render-block-container blocks))
+  (let [sub (subscribe [:blocks])]
+    (render-block-container @sub)))
 
 (defn render-current-query [current-query]
   [:p (clojure.string/join " " current-query)])
