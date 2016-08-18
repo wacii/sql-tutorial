@@ -116,10 +116,11 @@
 
 ;;
 ; visual programming
-(def blocks
-  [["SELECT" "FROM" "WHERE" "INNER" "OUTER" "JOIN"]
-   ["*" "ON" "AND" "OR" "=" "," "<" ">" ";"]
-   ["Sam" "Joe" "sam1234@example.com" "jjguy@example.com" 1 2 3]])
+(def blocks-map
+  {:select ["AND" "FROM" "OR" "SELECT" "UNION" "WHERE"]
+   :joins ["LEFT" "INNER" "JOIN" "ON" "OUTER" "RIGHT"]
+   :symbols ["*" "=" "," ";" "<" ">" "(" ")"]
+   :insert ["INSERT" "INTO" "MERGE" "VALUES"]})
 
 (defn block [word submit]
   [:button {:on-click submit} word])
@@ -139,17 +140,16 @@
   (let [sub (subscribe [:schema])]
     (render-schema-blocks @sub)))
 
-; TODO rename use-schema-blocks/schema-blocks
-(defn render-block-container [{:keys [blocks use-schema-blocks]}]
-  (.log js/console use-schema-blocks)
+(defn render-block-container [blocks]
   [:div
     [:ul.inline
       ^{:key "pop"} [:li [block "delete" #(dispatch [:pop])]]
       ^{:key "clear"} [:li [block "clear" #(dispatch [:clear])]]
       ^{:key "run"} [:li [block "run" #(dispatch [:run])]]]
-    (for [group blocks]
-      ^{:key group} [block-group group])
-    (and use-schema-blocks [schema-blocks])])
+    [block-group blocks]
+    (for [group blocks-map]
+      ^{:key (-> group (first) (str))} [block-group (second group)])
+    [schema-blocks]])
 (defn block-container []
   (let [sub (subscribe [:blocks])]
     (render-block-container @sub)))

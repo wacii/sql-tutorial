@@ -64,18 +64,6 @@
       (catch :default error
         (process-error db statement error)))))
 
-(def blocks-map
-  {:select ["AND" "FROM" "OR" "SELECT" "UNION" "WHERE"]
-   :joins ["LEFT" "INNER" "JOIN" "ON" "OUTER" "RIGHT"]
-   :symbols ["*" "=" "," ";" "<" ">" "(" ")"]
-   :insert ["INSERT" "INTO" "MERGE" "VALUES"]})
-
-(defn lesson->blocks [lesson]
-  (for [entry (:blocks-list lesson)]
-    (if (seq? entry)
-      entry
-      (entry blocks-map))))
-
 (defn change-lesson [id]
   (let [lesson (get-lesson id)]
     (sql/reset-db (:db-setup lesson))
@@ -84,7 +72,7 @@
       :current-lesson-id id
       :show-query-results (sql/execute (:show-query lesson))
       :schema (sql/schema)
-      :blocks (lesson->blocks lesson))))
+      :blocks (:blocks lesson))))
 (register-handler :change-lesson ls (fn [_ [_ id]] (change-lesson id)))
 
 (defn push-code-block [state [_ block]]

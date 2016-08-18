@@ -41,6 +41,4 @@
 (register-sub
   :blocks
   (fn [db _]
-    (reaction
-      {:blocks (:blocks @db)
-       :use-schema-blocks (get-in @db [:current-lesson :use-schema-blocks])})))
+    (reaction (:blocks @db))))
