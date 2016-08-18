@@ -122,16 +122,17 @@
    :symbols ["*" "=" "," ";" "<" ">" "(" ")"]
    :insert ["INSERT" "INTO" "MERGE" "VALUES"]})
 
-(defn block [word submit]
-  [:button {:on-click submit} word])
+(defn block
+  ([word]
+   [block word #(dispatch [:push word])])
+  ([word submit]
+   [:button {:on-click submit} word]))
 
 (defn block-group [words]
   [:ul.inline
     (for [word words]
-      ^{:key word} [:li [block word #(dispatch [:push word])]])])
+      ^{:key word} [:li [block word]])])
 
-; TODO render the table blocks differently with a different color or something
-;   maybe provide children to block-group and have those rendered first
 (defn render-schema-blocks [schema]
   [:div
     (for [table schema]
