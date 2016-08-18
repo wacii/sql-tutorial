@@ -26,16 +26,20 @@
               [{:id "dev"
                 :source-paths ["src"]
 
-                ;; If no code is to be run, set :figwheel true for continued automagical reloading
-                :figwheel {:on-jsload "sql-tutorial.core/on-js-reload"
-                           :devcards true}
+                :figwheel true
 
                 :compiler {:main sql-tutorial.core
                            :asset-path "js/compiled/out"
                            :output-to "resources/public/js/compiled/sql_tutorial.js"
                            :output-dir "resources/public/js/compiled/out"
-                           :source-map-timestamp true
-                           :externs ["externs/sql.js"]}} ; TODO does this need to be here?
+                           :source-map-timestamp true}}
+               {:id "devcards"
+                :source-paths ["src"]
+                :figwheel {:devcards true}
+                :compiler {:main sql-tutorial.core
+                           :asset-path "js/compiled/out"
+                           :output-to "resources/public/js/compiled/sql_tutorial.js"
+                           :output-dir "resources/public/js/compiled/out"}}
                ;; This next build is an compressed minified build for
                ;; production. You can build this with:
                ;; lein cljsbuild once min
