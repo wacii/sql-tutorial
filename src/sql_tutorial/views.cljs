@@ -114,6 +114,7 @@
   (let [sub (subscribe [:completed])]
     (render-lesson-finished @sub)))
 
+; TODO mru commands cache, insert after the lesson commands, hide overflow
 ;;
 ; visual programming
 (def blocks-map
@@ -160,10 +161,6 @@
 (defn current-query []
   (let [sub (subscribe [:current-query])]
     (render-current-query @sub)))
-
-; schema component, update on execute
-
-; query component, update on execute
 
 ;;
 ; app container

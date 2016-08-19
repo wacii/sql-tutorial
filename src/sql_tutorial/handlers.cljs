@@ -64,16 +64,21 @@
       (catch :default error
         (process-error db statement error)))))
 
-(defn change-lesson [id]
+(defn change-lesson [state id]
   (let [lesson (get-lesson id)]
     (sql/reset-db (:db-setup lesson))
-    (assoc init-state
+    (assoc state
+      :current-query []
+      :query ""
+      :result {}
+      :completed false
+      :correct false
       :current-lesson lesson
       :current-lesson-id id
       :show-query-results (sql/execute (:show-query lesson))
       :schema (sql/schema)
       :blocks (:blocks lesson))))
-(register-handler :change-lesson ls (fn [_ [_ id]] (change-lesson id)))
+(register-handler :change-lesson ls (fn [state [_ id]] (change-lesson state id)))
 
 (defn push-code-block [state [_ block]]
   (update state :current-query conj block))
@@ -95,6 +100,6 @@
   :initialize-db
   (fn [_ _]
     (let [lesson-id (ls-load)
-          state (change-lesson lesson-id)]
+          state (change-lesson init-state lesson-id)]
       (sql/reset-db (:db-setup (:current-lesson state)))
       state)))
