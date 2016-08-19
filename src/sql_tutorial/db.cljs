@@ -54,4 +54,6 @@
    :correct false
    :show-query-results {}
    :schema {}
-   :lessons-info (lessons-info)})
+   :lessons-info (lessons-info)
+   :blocks []
+   :mru-blocks `()})

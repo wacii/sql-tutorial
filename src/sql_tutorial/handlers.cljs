@@ -77,11 +77,13 @@
       :current-lesson-id id
       :show-query-results (sql/execute (:show-query lesson))
       :schema (sql/schema)
-      :blocks (:blocks lesson))))
+      :lesson-blocks (:blocks lesson))))
 (register-handler :change-lesson ls (fn [state [_ id]] (change-lesson state id)))
 
 (defn push-code-block [state [_ block]]
-  (update state :current-query conj block))
+  (-> state
+    (update :mru-blocks conj block)
+    (update :current-query conj block)))
 (register-handler :push push-code-block)
 
 (defn pop-code-block [state _]

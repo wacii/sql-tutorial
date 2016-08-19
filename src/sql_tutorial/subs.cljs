@@ -41,4 +41,7 @@
 (register-sub
   :blocks
   (fn [db _]
-    (reaction (:blocks @db))))
+    (reaction
+      (->> (into (:lesson-blocks @db) (:mru-blocks @db))
+        (distinct)
+        (take 10)))))
