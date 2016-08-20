@@ -102,19 +102,19 @@
                             {:id 2 :title "UPDATE"}
                             {:id 3 :title "INSERT INTO"}]]]))
 
-; TODO next problem button, linked to completed and corrected
 ;;
 ; lesson completion
-(defn render-lesson-finished [{:keys [completed correct]}]
+(defn render-lesson-finished [{:keys [completed correct next-lesson]}]
   [:div
     [:p (if completed "Completed!" "Not Completed!")]
-    [:p (if correct "Correct!" "Incorrect!")]])
+    [:p (if correct "Correct!" "Incorrect!")]
+    (if (and completed next-lesson)
+      [:button {:on-click #(dispatch [:change-lesson next-lesson])} "Next"])])
 
 (defn lesson-finished []
   (let [sub (subscribe [:completed])]
     (render-lesson-finished @sub)))
 
-; TODO mru commands cache, insert after the lesson commands, hide overflow
 ;;
 ; visual programming
 (def blocks-map

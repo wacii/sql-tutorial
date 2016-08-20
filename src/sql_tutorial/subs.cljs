@@ -26,7 +26,12 @@
   :completed
   (fn [db _]
     (reaction
-      (select-keys @db [:completed :correct]))))
+      (let [lesson-id (inc (:current-lesson-id @db))
+            lesson-count (count (:lessons-info @db))
+            next-lesson (if (>= lesson-id lesson-count) nil lesson-id)]
+        (merge
+          (select-keys @db [:completed :correct])
+          {:next-lesson next-lesson})))))
 
 (register-sub
   :current-query
