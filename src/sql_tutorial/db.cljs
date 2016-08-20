@@ -56,4 +56,5 @@
    :schema {}
    :lessons-info (lessons-info)
    :blocks []
-   :mru-blocks `()})
+   :mru-blocks `()
+   :keyboard-input? false})

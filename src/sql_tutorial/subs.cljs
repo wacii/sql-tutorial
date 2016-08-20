@@ -50,3 +50,8 @@
       (->> (into (:lesson-blocks @db) (:mru-blocks @db))
         (distinct)
         (take 10)))))
+
+(register-sub
+  :keyboard-input?
+  (fn [db _]
+    (reaction (:keyboard-input? @db))))

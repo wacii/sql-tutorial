@@ -59,7 +59,6 @@
   (let [sub (subscribe [:previous-query])]
     (fn [] [render-previous-query @sub])))
 
-; TODO: maintain current query on global state to mirror blocks ???
 ; TODO: up/down arrow through command history
 ;;
 ; input command
@@ -142,8 +141,15 @@
   (let [sub (subscribe [:schema])]
     (render-schema-blocks @sub)))
 
+(defn render-current-query [current-query]
+  [:p (clojure.string/join " " current-query)])
+(defn current-query []
+  (let [sub (subscribe [:current-query])]
+    (render-current-query @sub)))
+
 (defn render-block-container [blocks]
   [:div
+    [current-query]
     [:ul.inline
       ^{:key "pop"} [:li [block "delete" #(dispatch [:pop])]]
       ^{:key "clear"} [:li [block "clear" #(dispatch [:clear])]]
@@ -156,11 +162,16 @@
   (let [sub (subscribe [:blocks])]
     (render-block-container @sub)))
 
-(defn render-current-query [current-query]
-  [:p (clojure.string/join " " current-query)])
-(defn current-query []
-  (let [sub (subscribe [:current-query])]
-    (render-current-query @sub)))
+(defn render-code-input [keyboard-input?]
+  (let [button-text (if keyboard-input? "Blocks" "Keyboard")]
+    [:div
+      [:button {:on-click #(dispatch [:toggle-input-style])} button-text]
+      (if keyboard-input?
+        [search-field #(dispatch [:execute %])]
+        [block-container])]))
+(defn code-input []
+  (let [sub (subscribe [:keyboard-input?])]
+    (render-code-input @sub)))
 
 ;;
 ; app container
@@ -170,6 +181,4 @@
     [problem-description]
     [lesson-finished]
     [previous-query]
-    [search-field #(dispatch [:execute %])]
-    [block-container]
-    [current-query]])
+    [code-input]])

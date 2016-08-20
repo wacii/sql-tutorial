@@ -80,6 +80,10 @@
       :lesson-blocks (:blocks lesson))))
 (register-handler :change-lesson ls (fn [state [_ id]] (change-lesson state id)))
 
+(defn toggle-input-style [state _]
+  (update state :keyboard-input? not))
+(register-handler :toggle-input-style toggle-input-style)
+
 (defn push-code-block [state [_ block]]
   (-> state
     (update :mru-blocks conj block)
