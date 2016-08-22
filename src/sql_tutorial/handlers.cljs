@@ -34,7 +34,6 @@
       (.setItem js/localStorage "lesson" (:current-lesson-id new-state))
       new-state)))
 
-; TODO finish implementing show-query-results and schema
 ; HANDLERS
 (defn execute-statement [state statement]
   (let [result (sql/execute statement)
@@ -44,7 +43,6 @@
       :query statement
       :current-query []
       :result result
-      :show-query-results (sql/execute (:show-query lesson))
       :schema (sql/schema)
       :completed (or (:completed state) correct)
       :correct correct
@@ -75,7 +73,6 @@
       :correct false
       :current-lesson lesson
       :current-lesson-id id
-      :show-query-results (sql/execute (:show-query lesson))
       :schema (sql/schema)
       :lesson-blocks (:blocks lesson))))
 (register-handler :change-lesson ls (fn [state [_ id]] (change-lesson state id)))
