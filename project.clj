@@ -49,7 +49,8 @@
                            :main sql-tutorial.core
                            :optimizations :advanced
                            :pretty-print false
-                           :externs ["externs/sql.js"]}}]}
+                           :externs ["externs/sql.js"
+                                     "externs/md.js"]}}]}
 
   :figwheel {;; :http-server-root "public" ;; default and assumes "resources"
              ;; :server-port 3449 ;; default

@@ -4,11 +4,16 @@
             [reagent.core :as reagent]))
 
 ;;
+; markdown
+(defn markdown [raw]
+  [:div {:dangerouslySetInnerHTML {:__html (.render js/md (str raw))}}])
+
+;;
 ; show problem description component
 (defn render-problem-description [{:keys [title description]}]
   [:div
    [:p title]
-   [:p description]])
+   [markdown description]])
 
 (defn problem-description []
   (let [lesson-summary (subscribe [:current-lesson])]

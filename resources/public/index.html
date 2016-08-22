@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/style.css" rel="stylesheet" type="text/css">
+    <link href="css/hljs/default.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     <div id="app">
@@ -11,6 +12,20 @@
       <p>Checkout your developer console.</p>
     </div>
     <script src="js/sql.js" type="text/javascript"></script>
+    <script src="js/highlight.pack.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/7.0.1/markdown-it.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      window.md = window.markdownit({
+        highlight: function (str, lang) {
+          if (lang && hljs.getLanguage(lang)) {
+            try {
+              return hljs.highlight(lang, str).value;
+            } catch (_) {}
+          }
+          return '';
+        }
+      });
+    </script>
     <script src="js/compiled/sql_tutorial.js" type="text/javascript"></script>
     <script type="text/javascript">sql_tutorial.core.init()</script>
   </body>

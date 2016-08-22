@@ -2,7 +2,12 @@
 
 (def lessons
   [{:title "Select a column"
-    :description "Learn how to write sql queries to fetch records from a database. \nThe most basic select query takes the form `SELECT [column names] FROM [table name];`. An example against a database with table `users` and columns `name` and `email`: `SELECT email FROM users;` \nNow you! Select the names of all users from the database."
+    :description "
+Learn how to write sql queries to fetch records from a database.
+
+The most basic select query takes the form `SELECT [column names] FROM [table name];`. An example against a database with table `users` and columns `name` and `email`: `SELECT email FROM users;`
+
+Now you! Select the names of all users from the database."
     :db-setup "DROP TABLE IF EXISTS users;
                CREATE TABLE users (name, email);
                INSERT INTO users (name, email)
@@ -12,7 +17,10 @@
              :actual :current}]
     :blocks ["SELECT" "email" "FROM" "users" ";" "name"]}
    {:title "Select multiple columns"
-    :description "Multiple columns may be specified in a comma-separated list. \nTry selecting both `name` and `email` from `users`."
+    :description "
+Multiple columns may be specified in a comma-separated list.
+
+Try selecting both `name` and `email` from `users`."
     :db-setup "DROP TABLE IF EXISTS users;
                CREATE TABLE users (name, email);
                INSERT INTO users (name, email)
@@ -23,7 +31,10 @@
              :actual :current}]
     :blocks ["," "name" "email"]}
    {:title "Select all columns"
-    :description "As a shortcut, an asterisk (`*`) may be used to specify all columns, instead of writing them all out. \nTry selecting all columns from `users`."
+    :description "
+As a shortcut, an asterisk may be used to specify all columns, instead of writing them all out.
+
+Try selecting all columns from `users`."
     :db-setup "DROP TABLE IF EXISTS users;
                CREATE TABLE users (name, email, id int);
                INSERT INTO users (name, email, id)
