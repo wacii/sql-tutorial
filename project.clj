@@ -31,7 +31,7 @@
                 :compiler {:main sql-tutorial.core
                            :asset-path "js/compiled/out"
                            :output-to "resources/public/js/compiled/sql_tutorial.js"
-                           :output-dir "resources/public/js/compiled/out"
+                           :output-dir "resources/public/js/compiled/out-1"
                            :source-map-timestamp true}}
                {:id "devcards"
                 :source-paths ["src"]
@@ -39,13 +39,14 @@
                 :compiler {:main sql-tutorial.core
                            :asset-path "js/compiled/out"
                            :output-to "resources/public/js/compiled/sql_tutorial.js"
-                           :output-dir "resources/public/js/compiled/out"}}
+                           :output-dir "resources/public/js/compiled/out-2"}}
                ;; This next build is an compressed minified build for
                ;; production. You can build this with:
                ;; lein cljsbuild once min
                {:id "min"
                 :source-paths ["src"]
                 :compiler {:output-to "resources/public/js/compiled/sql_tutorial.js"
+                           :output-dir "resources/public/js/compiled/out-3"
                            :main sql-tutorial.core
                            :optimizations :advanced
                            :pretty-print false
