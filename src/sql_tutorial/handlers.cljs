@@ -74,7 +74,10 @@
       :current-lesson lesson
       :current-lesson-id id
       :schema (sql/schema)
-      :lesson-blocks (:blocks lesson))))
+      :blocks (->> (:blocks lesson)
+                (into (:mru-blocks state))
+                (distinct)
+                (take 10)))))
 (register-handler :change-lesson ls (fn [state [_ id]] (change-lesson state id)))
 
 (defn toggle-input-style [state _]

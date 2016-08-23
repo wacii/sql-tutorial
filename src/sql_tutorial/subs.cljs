@@ -46,10 +46,7 @@
 (register-sub
   :blocks
   (fn [db _]
-    (reaction
-      (->> (into (:lesson-blocks @db) (:mru-blocks @db))
-        (distinct)
-        (take 10)))))
+    (reaction (:blocks @db))))
 
 (register-sub
   :keyboard-input?
