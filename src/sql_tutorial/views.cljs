@@ -121,12 +121,6 @@
 
 ;;
 ; visual programming
-(def blocks-map
-  {:select ["AND" "FROM" "OR" "SELECT" "UNION" "WHERE"]
-   :joins ["LEFT" "INNER" "JOIN" "ON" "OUTER" "RIGHT"]
-   :symbols ["*" "=" "," ";" "<" ">" "(" ")"]
-   :insert ["INSERT" "INTO" "MERGE" "VALUES"]})
-
 (defn block
   ([word]
    [block word #(dispatch [:push word])])
@@ -138,31 +132,20 @@
     (for [word words]
       ^{:key word} [:li [block word]])])
 
-(defn render-schema-blocks [schema]
-  [:div
-    (for [table schema]
-      ^{:key (first table)} [block-group (flatten table)])])
-(defn schema-blocks []
-  (let [sub (subscribe [:schema])]
-    (render-schema-blocks @sub)))
+(defn current-query [query-blocks]
+  [:p (clojure.string/join " " query-blocks)])
 
-(defn render-current-query [current-query]
-  [:p (clojure.string/join " " current-query)])
-(defn current-query []
-  (let [sub (subscribe [:current-query])]
-    (render-current-query @sub)))
-
-(defn render-block-container [blocks]
+(defn render-block-container
+  [{:keys [query-blocks lesson-blocks static-blocks]}]
   [:div
-    [current-query]
+    [current-query query-blocks]
     [:ul.inline
       ^{:key "pop"} [:li [block "delete" #(dispatch [:pop])]]
       ^{:key "clear"} [:li [block "clear" #(dispatch [:clear])]]
       ^{:key "run"} [:li [block "run" #(dispatch [:run])]]]
-    [block-group blocks]
-    (for [group blocks-map]
-      ^{:key (-> group (first) (str))} [block-group (second group)])
-    [schema-blocks]])
+    [block-group lesson-blocks]
+    (for [[category blocks] static-blocks]
+      ^{:key category} [block-group blocks])])
 (defn block-container []
   (let [sub (subscribe [:blocks])]
     (render-block-container @sub)))

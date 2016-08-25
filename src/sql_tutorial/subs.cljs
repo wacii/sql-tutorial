@@ -1,6 +1,7 @@
 (ns sql-tutorial.subs
   (:require-macros [reagent.ratom :refer [reaction]])
-  (:require [re-frame.core :refer [register-sub]]))
+  (:require [re-frame.core :refer [register-sub]]
+            [sql-tutorial.db :as db]))
 
 (register-sub
   :current-lesson
@@ -34,19 +35,13 @@
           {:next-lesson next-lesson})))))
 
 (register-sub
-  :current-query
-  (fn [db _]
-    (reaction (:current-query @db))))
-
-(register-sub
-  :schema
-  (fn [db _]
-    (reaction (:schema @db))))
-
-(register-sub
   :blocks
   (fn [db _]
-    (reaction (:blocks @db))))
+    (reaction
+      (let [schema-blocks (-> @db :schema vec flatten)]
+        {:query-blocks (:current-query @db)
+         :lesson-blocks (:blocks @db)
+         :static-blocks (assoc db/blocks-map :schema schema-blocks)}))))
 
 (register-sub
   :keyboard-input?
