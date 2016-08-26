@@ -40,9 +40,10 @@
     (reaction
       (let [schema-blocks (-> @db :schema vec flatten)]
         {:query-blocks (:current-query @db)
-         :block-groups (merge {:recent (:blocks @db)}
+         :block-category (:block-category @db)
+         :block-groups (merge {"Recent" (:blocks @db)}
                               db/blocks-map
-                              {:database schema-blocks})}))))
+                              {"Database" schema-blocks})}))))
 
 (register-sub
   :keyboard-input?

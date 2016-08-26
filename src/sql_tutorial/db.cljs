@@ -1,10 +1,10 @@
 (ns sql-tutorial.db)
 
 (def blocks-map
-  {:statements ["SELECT" "FROM" "WHERE" "AND" "OR"
-                "INNER" "LEFT" "OUTER" "JOIN" "ON" 
-                "INSERT" "INTO" "VALUES"]
-   :symbols ["*" "=" "," ";" "<" ">" "(" ")"]})
+  {"Statements" ["SELECT" "FROM" "WHERE" "AND" "OR"
+                 "INNER" "LEFT" "OUTER" "JOIN" "ON"
+                 "INSERT" "INTO" "VALUES"]
+   "Symbols" ["*" "=" "," ";" "<" ">" "(" ")"]})
 
 (def lessons
   [{:title "Select a column"
@@ -94,4 +94,5 @@ Try selecting all columns from `users`."
    :lessons-info (lessons-info)
    :blocks []
    :mru-blocks `()
+   :block-category "Recent"
    :keyboard-input? false})

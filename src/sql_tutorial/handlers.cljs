@@ -102,6 +102,10 @@
   (execute-statement state (clojure.string/join " " (:current-query state))))
 (register-handler :run run-code-blocks)
 
+(defn change-block-category [state [_ category]]
+  (assoc state :block-category category))
+(register-handler :change-block-category change-block-category)
+
 (register-handler
   :initialize-db
   (fn [_ _]

@@ -135,15 +135,22 @@
 (defn current-query [query-blocks]
   [:p (clojure.string/join " " query-blocks)])
 
-(defn render-block-container [{:keys [query-blocks block-groups]}]
+(defn render-block-container
+  [{:keys [query-blocks block-groups block-category]}]
   [:div
     [current-query query-blocks]
+    [:nav
+      (for [category (keys block-groups)]
+        ^{:key category}
+        [:a {:class (if (= category block-category) "active")
+             :href "#"
+             :on-click #(dispatch [:change-block-category category])}
+          category])]
+    [block-group (get block-groups block-category)]
     [:ul.inline
       ^{:key "pop"} [:li [block "delete" #(dispatch [:pop])]]
       ^{:key "clear"} [:li [block "clear" #(dispatch [:clear])]]
-      ^{:key "run"} [:li [block "run" #(dispatch [:run])]]]
-    (for [[category blocks] block-groups]
-      ^{:key category} [block-group blocks])])
+      ^{:key "run"} [:li [block "run" #(dispatch [:run])]]]])
 (defn block-container []
   (let [sub (subscribe [:blocks])]
     (render-block-container @sub)))
