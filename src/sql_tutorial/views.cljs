@@ -11,8 +11,8 @@
 ;;
 ; show problem description component
 (defn render-problem-description [{:keys [title description]}]
-  [:div
-   [:p title]
+  [:section
+   [:h1 title]
    [markdown description]])
 
 (defn problem-description []
@@ -51,7 +51,7 @@
   "Display query and its results, or a no results message."
   [{:keys [query result error]}]
   (if (empty? query)
-    [:p "Enter a command"]
+    [:p "No query"]
     [:div
       [:pre [:code query]]
       (if (empty? error)
@@ -78,8 +78,10 @@
                  (reset! value (-> event .-target .-value)))]
 
     (fn []
-      [:form {:on-submit submit}
-        [:input {:type "text", :value @value, :on-change update}]])))
+      [:form.prompt {:on-submit submit}
+        [:input {:type "text", :value @value, :on-change update}]
+        [:div.keyboard-toggle {:on-click #(dispatch [:toggle-input-style])}
+          [:i.material-icons "keyboard"]]])))
 
 (defcard search-field
   (reagent/as-element [search-field #(js/alert %)]))
@@ -109,9 +111,9 @@
 ;;
 ; lesson completion
 (defn render-lesson-finished [{:keys [completed correct next-lesson]}]
-  [:div
-    [:p (if completed "Completed!" "Not Completed!")]
-    [:p (if correct "Correct!" "Incorrect!")]
+  [:div.status
+    [:div.complete (if completed "Completed!" "Not Completed!")]
+    [:div.correct (if correct "Correct!" "Incorrect!")]
     (if (and completed next-lesson)
       [:button {:on-click #(dispatch [:change-lesson next-lesson])} "Next"])])
 
@@ -125,53 +127,58 @@
   ([word]
    [block word #(dispatch [:push word])])
   ([word submit]
-   [:button {:on-click submit} word]))
+   [:a {:on-click submit} word]))
 
 (defn block-group [words]
-  [:ul.inline
-    (for [word words]
-      ^{:key word} [:li [block word]])])
+  [:div.keyboard
+    [:div.div
+      (for [word words]
+        ^{:key word} [block word])]])
 
 (defn current-query [query-blocks]
-  [:p (clojure.string/join " " query-blocks)])
+  [:div.prompt
+    [:input {:disabled true
+             :placeholder "|"
+             :value (clojure.string/join " " query-blocks)}]
+    [:div.keyboard-toggle {:on-click #(dispatch [:toggle-input-style])}
+      [:i.material-icons "keyboard"]]])
 
 (defn render-block-container
   [{:keys [query-blocks block-groups block-category]}]
   [:div
     [current-query query-blocks]
-    [:nav
-      (for [category (keys block-groups)]
-        ^{:key category}
-        [:a {:class (if (= category block-category) "active")
-             :href "#"
-             :on-click #(dispatch [:change-block-category category])}
-          category])]
+    [:div.nav-wrap
+      [:nav
+        (for [category (keys block-groups)]
+          ^{:key category}
+          [:a {:class (if (= category block-category) "active")
+               :on-click #(dispatch [:change-block-category category])}
+            category])]]
     [block-group (get block-groups block-category)]
-    [:ul.inline
-      ^{:key "pop"} [:li [block "delete" #(dispatch [:pop])]]
-      ^{:key "clear"} [:li [block "clear" #(dispatch [:clear])]]
-      ^{:key "run"} [:li [block "run" #(dispatch [:run])]]]])
+    [:div.commands
+      ^{:key "pop"} [:button.button-gray {:on-click #(dispatch [:pop])} "Delete"]
+      ^{:key "clear"} [:button.button-gray {:on-click #(dispatch [:clear])} "Clear"]
+      ^{:key "run"} [:button.button-orange {:on-click #(dispatch [:run])} "Run"]]])
 (defn block-container []
   (let [sub (subscribe [:blocks])]
     (render-block-container @sub)))
 
-(defn render-code-input [keyboard-input?]
-  (let [button-text (if keyboard-input? "Blocks" "Keyboard")]
-    [:div
-      [:button {:on-click #(dispatch [:toggle-input-style])} button-text]
-      (if keyboard-input?
-        [search-field #(dispatch [:execute %])]
-        [block-container])]))
 (defn code-input []
-  (let [sub (subscribe [:keyboard-input?])]
-    (render-code-input @sub)))
+  (let [keyboard-input? (subscribe [:keyboard-input?])]
+    (fn []
+      (if @keyboard-input?
+        [search-field #(dispatch [:execute %])]
+        [block-container]))))
 
 ;;
 ; app container
 (defn problem-layout []
-  [:div
+  [:main.container
+    [:header
+      [:div.container
+        [:a (goog.string/unescapeEntities "&#9776;")]]]
     [lesson-select #(dispatch [:change-lesson %])]
     [problem-description]
-    [lesson-finished]
     [previous-query]
+    [lesson-finished]
     [code-input]])
