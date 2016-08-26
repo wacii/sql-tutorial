@@ -1,10 +1,10 @@
 (ns sql-tutorial.db)
 
 (def blocks-map
-  {:select ["AND" "FROM" "OR" "SELECT" "UNION" "WHERE"]
-   :joins ["LEFT" "INNER" "JOIN" "ON" "OUTER" "RIGHT"]
-   :symbols ["*" "=" "," ";" "<" ">" "(" ")"]
-   :insert ["INSERT" "INTO" "MERGE" "VALUES"]})
+  {:statements ["SELECT" "FROM" "WHERE" "AND" "OR"
+                "INNER" "LEFT" "OUTER" "JOIN" "ON" 
+                "INSERT" "INTO" "VALUES"]
+   :symbols ["*" "=" "," ";" "<" ">" "(" ")"]})
 
 (def lessons
   [{:title "Select a column"

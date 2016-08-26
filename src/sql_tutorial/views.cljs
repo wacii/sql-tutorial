@@ -135,16 +135,14 @@
 (defn current-query [query-blocks]
   [:p (clojure.string/join " " query-blocks)])
 
-(defn render-block-container
-  [{:keys [query-blocks lesson-blocks static-blocks]}]
+(defn render-block-container [{:keys [query-blocks block-groups]}]
   [:div
     [current-query query-blocks]
     [:ul.inline
       ^{:key "pop"} [:li [block "delete" #(dispatch [:pop])]]
       ^{:key "clear"} [:li [block "clear" #(dispatch [:clear])]]
       ^{:key "run"} [:li [block "run" #(dispatch [:run])]]]
-    [block-group lesson-blocks]
-    (for [[category blocks] static-blocks]
+    (for [[category blocks] block-groups]
       ^{:key category} [block-group blocks])])
 (defn block-container []
   (let [sub (subscribe [:blocks])]
